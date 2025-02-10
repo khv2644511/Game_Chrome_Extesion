@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import gsap from 'gsap';
 
 export default function basic() {
   // console.log(THREE);
@@ -65,15 +66,7 @@ export default function basic() {
   const clock = new THREE.Clock();
   function draw() {
     const delta = clock.getDelta();
-    console.log(delta);
-    // console.log(clock.getElapsedTime()); // 기기 성능에 상관없이 동일한 시간경과를 나타냄
-    // const time = clock.getElapsedTime();
-    // 각도는 Radian을 사용
-    // 360도는 2파이
-    // mesh.rotation.y += 0.1;
-    // mesh.rotation.y += THREE.MathUtils.degToRad(1); // 1도씩 회전
-    // mesh.rotation.y = time;
-    // mesh.rotation.y += 0.1;
+
     mesh.rotation.y += delta;
     renderer.render(scene, camera);
 
@@ -81,6 +74,14 @@ export default function basic() {
     renderer.setAnimationLoop(draw); // vr 같은걸 만들 때는 꼭 이걸로 사용해야함
   }
 
+  // gsap
+  gsap.to(
+    mesh.position, // 변화시키고 싶은 object,
+    {
+      duration: 1,
+      y: 2,
+    }
+  );
   function setSize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     // updateProjectionMatrix => 카메라 투영에 관련된 값에 변화가 있을 경우 실행해야 함
