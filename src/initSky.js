@@ -8,6 +8,8 @@ export default function initSky() {
   const sky = new Sky();
   sky.scale.setScalar(450000);
 
+  const sun = new THREE.Vector3();
+
   const phi = THREE.MathUtils.degToRad(90);
   const theta = THREE.MathUtils.degToRad(180);
   const sunPosition = new THREE.Vector3().setFromSphericalCoords(1, phi, theta);
@@ -47,5 +49,24 @@ export default function initSky() {
     skyUniforms['mieDirectionalG'].value = value;
   });
 
+  gui.add(skyParams, 'elevation', 40, 150, 1).onChange((value) => {
+    const phi = THREE.MathUtils.degToRad(value);
+    sun.setFromSphericalCoords(1, phi, THREE.MathUtils.degToRad(skyParams.azimuth));
+    skyUniforms['sunPosition'].value.copy(sun);
+  });
+
+  gui.add(skyParams, 'azimuth', 0, 360, 1).onChange((value) => {
+    const theta = THREE.MathUtils.degToRad(value);
+    sun.setFromSphericalCoords(1, THREE.MathUtils.degToRad(skyParams.elevation), theta);
+    skyUniforms['sunPosition'].value.copy(sun);
+  });
+
   cm1.scene.add(sky);
+
+  // // 애니메이션 루프
+  // function animate() {
+  //   requestAnimationFrame(animate);
+  //   renderer.render(cm1.scene, camera);
+  // }
+  // animate();
 }
