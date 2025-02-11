@@ -32,7 +32,8 @@ export const cm2 = {
   lightColor: '#ffe9ac',
   lightOffColor: '#222',
   pillarColor: '#071d28',
-  floorColor: '#111',
+  floorColor: '#D3D3D3',
+  // floorColor: 'red',
   barColor: '#441c1d',
   glassColor: '#9fdfff',
   waterColor: '0x001e0f',
@@ -40,9 +41,8 @@ export const cm2 = {
 };
 
 export const geo = {
-  water: new PlaneGeometry(10000, 10000),
   pillar: new BoxGeometry(5, 10, 5),
-  floor: new BoxGeometry(200, 1, 200),
+  floor: new BoxGeometry(50, 20, 50),
   bar: new BoxGeometry(0.1, 0.3, 1.2 * 21),
   box: new BoxGeometry(1, 1, 1),
   sideLight: new SphereGeometry(0.1, 6, 6),

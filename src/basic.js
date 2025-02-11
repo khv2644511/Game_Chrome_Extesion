@@ -6,6 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { Water } from 'three/addons/objects/Water.js';
 import { GUI } from 'dat.gui';
+import { Floor } from './Floor';
 
 export default function basic() {
   // console.log(THREE);
@@ -30,15 +31,17 @@ export default function basic() {
   //   scene.background = new THREE.Color('blue');
 
   // Camera
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  // const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 20000);
-
-  camera.position.set(30, 30, 100);
+  // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 20000);
+  // camera.position.set(-50, 60, 350);
+  camera.position.set(-40, 30, 200);
 
   // Light
   // const light = new THREE.DirectionalLight(0xffffff, 1);
   // light.position.z = 10;
   // cm1.scene.add(light);
+  const ambientLight = new THREE.AmbientLight(cm2.lightColor, 2);
+  cm1.scene.add(ambientLight);
 
   // Controls
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -121,6 +124,28 @@ export default function basic() {
 
   updateSun();
 
+  // 물체만들기
+  // const glassUnitSize = 1.2; // 유리판 하나의 크기
+  const glassUnitSize = 12; // 유리판 하나의 크기
+  const numberOfGlass = 10; // 유리판 개수
+
+  // 바닥
+  const floor1 = new Floor({
+    name: 'floor',
+    x: 0,
+    y: 0,
+    z: -glassUnitSize * 12 - glassUnitSize / 2,
+    // z: -100,
+  });
+
+  const floor2 = new Floor({
+    name: 'floor',
+    x: 0,
+    y: 0,
+    z: glassUnitSize * 12 + glassUnitSize / 2,
+    // z: 100,
+  });
+
   // GUI
   const gui = new GUI();
 
@@ -135,17 +160,6 @@ export default function basic() {
   folderWater.add(waterUniforms.distortionScale, 'value', 0, 8, 0.1).name('distortionScale');
   folderWater.add(waterUniforms.size, 'value', 0.1, 10, 0.1).name('size');
   folderWater.open();
-  // sky_folder.add(skyParams, 'elevation', 40, 150, 1).onChange((value) => {
-  //   const phi = THREE.MathUtils.degToRad(value);
-  //   sun.setFromSphericalCoords(1, phi, THREE.MathUtils.degToRad(skyParams.azimuth));
-  //   skyUniforms['sunPosition'].value.copy(sun);
-  // });
-
-  // sky_folder.add(skyParams, 'azimuth', 0, 360, 1).onChange((value) => {
-  //   const theta = THREE.MathUtils.degToRad(value);
-  //   sun.setFromSphericalCoords(1, THREE.MathUtils.degToRad(skyParams.elevation), theta);
-  //   skyUniforms['sunPosition'].value.copy(sun);
-  // });
 
   // 그리기
   const clock = new THREE.Clock();
