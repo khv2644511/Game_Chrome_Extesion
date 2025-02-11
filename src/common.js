@@ -1,4 +1,4 @@
-import { BoxGeometry, MeshBasicMaterial, MeshPhongMaterial, Scene, SphereGeometry } from 'three';
+import { BoxGeometry, MeshBasicMaterial, MeshPhongMaterial, Scene, SphereGeometry, PlaneGeometry } from 'three';
 import { FontLoader, GLTFLoader } from 'three/examples/jsm/Addons.js';
 import { World, Material } from 'cannon-es';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
@@ -35,9 +35,12 @@ export const cm2 = {
   floorColor: '#111',
   barColor: '#441c1d',
   glassColor: '#9fdfff',
+  waterColor: '0x001e0f',
+  sunColor: '0xffffff',
 };
 
 export const geo = {
+  water: new PlaneGeometry(10000, 10000),
   pillar: new BoxGeometry(5, 10, 5),
   floor: new BoxGeometry(200, 1, 200),
   bar: new BoxGeometry(0.1, 0.3, 1.2 * 21),
