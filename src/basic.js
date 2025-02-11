@@ -7,6 +7,7 @@ import { Sky } from 'three/addons/objects/Sky.js';
 import { Water } from 'three/addons/objects/Water.js';
 import { GUI } from 'dat.gui';
 import { Floor } from './Floor';
+import { Stone } from './Stone';
 
 export default function basic() {
   // console.log(THREE);
@@ -22,6 +23,7 @@ export default function basic() {
   renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
   renderer.shadowMap.enabled = true; // 그림자 사용
   renderer.shadowMap.type = THREE.PCFShadowMap; // 그림자 부드럽게
+  // renderer.outputEncoding = THREE.sRGBEncoding; // 색상 출력 설정
 
   // renderer.setClearColor('#0x00ff00'); // 배경색 설정
   // renderer.setClearAlpha(0.2); // 0-1
@@ -48,7 +50,7 @@ export default function basic() {
   controls.enableDamping = true;
 
   // 반사 재질 생성
-  const box = new Box({ name: 'bar', x: 0, y: 0, z: 0 });
+  // const box = new Box({ name: 'bar', x: 0, y: 0, z: 0 });
 
   // Water
   const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
@@ -125,16 +127,65 @@ export default function basic() {
   updateSun();
 
   // 물체만들기
-  // const glassUnitSize = 1.2; // 유리판 하나의 크기
-  const glassUnitSize = 12; // 유리판 하나의 크기
-  const numberOfGlass = 10; // 유리판 개수
+
+  const stoneUnitSize = 10; // 스톤 하나의 크기
+  const numberOfstone = 10; // 스톤 개수
+
+  // 스톤
+  let stoneTypeNumber = 0; // 0 or 1
+  let stoneTypes = [];
+  const stoneZ = [];
+  for (let i = 0; i < numberOfstone; i++) {
+    stoneZ.push(-(i * stoneUnitSize * 2 - stoneUnitSize * 9));
+  }
+  // console.log(stoneZ);
+
+  for (let i = 0; i < numberOfstone; i++) {
+    stoneTypeNumber = Math.round(Math.random()); // 반올림으로 0 or 1이 나오도록
+    switch (stoneTypeNumber) {
+      case 0:
+        stoneTypes = ['normal', 'strong'];
+        break;
+      case 1:
+        stoneTypes = ['strong', 'normal'];
+        break;
+    }
+    //   console.log(stoneTypes);
+
+    const textureLoader = new THREE.TextureLoader();
+    const stoneTexture = textureLoader.load('/textures/stone/Stylized_Rocks_002_basecolor.jpg'); // 별 이미지 로드
+
+    const stone1 = new Stone({
+      step: i + 1,
+      name: `stone-${stoneTypes[0]}`,
+      x: -10,
+      y: 1,
+      z: stoneZ[i],
+      type: stoneTypes[0],
+      cannonMaterial: cm1.stonetMaterial,
+      map: stoneTexture,
+    });
+
+    const stone2 = new Stone({
+      step: i + 1,
+      name: `stone-${stoneTypes[1]}`,
+      x: 10,
+      y: 1,
+      z: stoneZ[i],
+      type: stoneTypes[1],
+      cannonMaterial: cm1.stonetMaterial,
+      map: stoneTexture,
+    });
+
+    // objects.push(stone1, stone2);
+  }
 
   // 바닥
   const floor1 = new Floor({
     name: 'floor',
     x: 0,
     y: 0,
-    z: -glassUnitSize * 12 - glassUnitSize / 2,
+    z: -stoneUnitSize * 12 - stoneUnitSize / 2,
     // z: -100,
   });
 
@@ -142,7 +193,7 @@ export default function basic() {
     name: 'floor',
     x: 0,
     y: 0,
-    z: glassUnitSize * 12 + glassUnitSize / 2,
+    z: stoneUnitSize * 12 + stoneUnitSize / 2,
     // z: 100,
   });
 

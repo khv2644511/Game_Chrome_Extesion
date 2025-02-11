@@ -36,6 +36,7 @@ export const cm2 = {
   // floorColor: 'red',
   barColor: '#441c1d',
   glassColor: '#9fdfff',
+  stoneColor: '#696969',
   waterColor: '0x001e0f',
   sunColor: '0xffffff',
 };
@@ -46,7 +47,8 @@ export const geo = {
   bar: new BoxGeometry(0.1, 0.3, 1.2 * 21),
   box: new BoxGeometry(1, 1, 1),
   sideLight: new SphereGeometry(0.1, 6, 6),
-  glass: new BoxGeometry(1.2, 0.05, 1.2),
+  glass: new BoxGeometry(12, 0.05, 12),
+  stone: new BoxGeometry(12, 2, 12),
   text: new TextGeometry('YOU WIN !', {
     font: cm1.font,
     size: 0.5,
@@ -64,7 +66,7 @@ export const mat = {
   pillar: new MeshPhongMaterial({
     color: cm2.pillarColor,
   }),
-  floor: new MeshPhongMaterial({ color: cm2.floorColor }),
+  floor: new MeshPhongMaterial({ color: cm2.floorColor, map: undefined }),
   bar: new MeshPhongMaterial({ color: cm2.barColor }),
   box: new MeshPhongMaterial({ color: cm2.pillarColor }),
   sideLight: new MeshPhongMaterial({ color: cm2.lightColor }),
@@ -78,6 +80,17 @@ export const mat = {
     transparent: true,
     // 테스트 할 때 0.5로
     opacity: 0.5, // 완전 불투명: 1
+  }),
+  stone1: new MeshPhongMaterial({
+    color: cm2.stoneColor,
+    transparent: true,
+    opacity: 0.3, // 완전 불투명: 1
+  }),
+  stone2: new MeshPhongMaterial({
+    color: cm2.stoneColor,
+    transparent: true,
+    // 테스트 할 때 0.5로
+    opacity: 0.8, // 완전 불투명: 1
   }),
   text: new MeshBasicMaterial(),
 };
