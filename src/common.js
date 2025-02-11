@@ -28,6 +28,7 @@ export const cm1 = {
 export const cm2 = {
   step: 0,
   backgroundColor: '#3e1322',
+  // backgroundWhiteColor: '#3e1322',
   lightColor: '#ffe9ac',
   lightOffColor: '#222',
   pillarColor: '#071d28',
@@ -40,6 +41,7 @@ export const geo = {
   pillar: new BoxGeometry(5, 10, 5),
   floor: new BoxGeometry(200, 1, 200),
   bar: new BoxGeometry(0.1, 0.3, 1.2 * 21),
+  box: new BoxGeometry(1, 1, 1),
   sideLight: new SphereGeometry(0.1, 6, 6),
   glass: new BoxGeometry(1.2, 0.05, 1.2),
   text: new TextGeometry('YOU WIN !', {
@@ -61,6 +63,7 @@ export const mat = {
   }),
   floor: new MeshPhongMaterial({ color: cm2.floorColor }),
   bar: new MeshPhongMaterial({ color: cm2.barColor }),
+  box: new MeshPhongMaterial({ color: cm2.pillarColor }),
   sideLight: new MeshPhongMaterial({ color: cm2.lightColor }),
   glass1: new MeshPhongMaterial({
     color: cm2.glassColor,
