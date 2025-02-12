@@ -55,7 +55,26 @@ export default function basic() {
   // const box = new Box({ name: 'bar', x: 0, y: 0, z: 0 });
 
   // 물리 엔진
-  cm1.world.gravity.set(0, -10, 0);
+  cm1.world.gravity.set(0, -50, 0);
+
+  const defaultContactMaterial = new CANNON.ContactMaterial(cm1.defaultMaterial, cm1.defaultMaterial, {
+    friction: 0.3, // 마찰
+    restitution: 0.2, // 반발
+  });
+
+  const stoneDefaultContactMaterial = new CANNON.ContactMaterial(cm1.stonetMaterial, cm1.defaultMaterial, {
+    friction: 1,
+    restitution: 0,
+  });
+
+  const playerStoneContactMaterial = new CANNON.ContactMaterial(cm1.playerMaterial, cm1.stonetMaterial, {
+    friction: 1,
+    restitution: 0,
+  });
+
+  cm1.world.defaultContactMaterial = defaultContactMaterial;
+  cm1.world.addContactMaterial(stoneDefaultContactMaterial);
+  cm1.world.addContactMaterial(playerStoneContactMaterial);
 
   // Water
   const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
@@ -166,22 +185,24 @@ export default function basic() {
       step: i + 1,
       name: `stone-${stoneTypes[0]}`,
       x: -10,
-      y: 0,
+      y: 10,
       z: stoneZ[i],
       type: stoneTypes[0],
       cannonMaterial: cm1.stonetMaterial,
       map: stoneTexture,
+      // mass: 0,
     });
 
     stone2 = new Stone({
       step: i + 1,
       name: `stone-${stoneTypes[1]}`,
       x: 10,
-      y: 0,
+      y: 10,
       z: stoneZ[i],
       type: stoneTypes[1],
       cannonMaterial: cm1.stonetMaterial,
       map: stoneTexture,
+      // mass: 0,
     });
 
     objects.push(stone1, stone2);
@@ -195,7 +216,7 @@ export default function basic() {
   const floor1 = new Floor({
     name: 'floor',
     x: 0,
-    y: 0,
+    y: 10,
     z: -stoneUnitSize * 12 - stoneUnitSize / 2,
     cannonMaterial: cm1.defaultMaterial,
     mass: 0,
@@ -204,7 +225,7 @@ export default function basic() {
   const floor2 = new Floor({
     name: 'floor',
     x: 0,
-    y: 0,
+    y: 10,
     z: stoneUnitSize * 12 + stoneUnitSize / 2,
     cannonMaterial: cm1.defaultMaterial,
     mass: 0,
@@ -214,11 +235,12 @@ export default function basic() {
   const player = new Player({
     name: 'player',
     x: 0,
-    y: 6,
+    // y: 6,
+    y: 30,
     z: 120,
     rotationY: Math.PI, // 180도
     cannonMaterial: cm1.playerMaterial,
-    // mass: 30, // 무게
+    mass: 30, // 무게
   });
   objects.push(player);
 
@@ -266,6 +288,9 @@ export default function basic() {
 
         cm2.step++; // 현재 스텝
         console.log(cm2.step);
+
+        console.log('player', player);
+
         switch (mesh.type) {
           case 'normal':
             console.log('normal');
@@ -277,7 +302,6 @@ export default function basic() {
               setTimeout(() => {
                 // onReplay = true; // camera2 사용
                 player.cannonBody.position.y = 0;
-                // stones[i].cannonBody.position.y = 0;
                 const stones_normal = stones.filter((stone) => stone.type === 'normal');
                 stones_normal[cm2.step - 1].cannonBody.position.y = -10;
 
@@ -306,7 +330,7 @@ export default function basic() {
 
         gsap.to(player.cannonBody.position, {
           duration: 0.4,
-          y: 10,
+          y: 20,
         });
       }
     }
@@ -335,13 +359,12 @@ export default function basic() {
 
     if (cm1.mixer) cm1.mixer.update(delta);
 
-    // cm1.world.step(1 / 60, delta, 3);
+    cm1.world.step(1 / 60, delta, 3);
 
     water.material.uniforms['time'].value += 1.0 / 60.0;
 
     // 물리엔진, cannonBody위치를 mesh들이 따라가도록 설정
     objects.forEach((item) => {
-      // console.log(item);
       if (item.cannonBody) {
         if (item.name === 'player') {
           // console.log(item.modelMesh);
@@ -352,7 +375,7 @@ export default function basic() {
             } // 회전 -> 넘어지는 설정
             item.modelMesh.quaternion.copy(item.cannonBody.quaternion); // 회전 -> 넘어지는 설정
           }
-          // item.modelMesh.position.y += 0.15;
+          item.modelMesh.position.y += 5;
         } else {
           item.mesh.position.copy(item.cannonBody.position);
           item.mesh.quaternion.copy(item.cannonBody.quaternion);
