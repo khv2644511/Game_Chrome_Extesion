@@ -8,6 +8,8 @@ import { Water } from 'three/addons/objects/Water.js';
 import { GUI } from 'dat.gui';
 import { Floor } from './Floor';
 import { Stone } from './Stone';
+import { Player } from './Player';
+import * as CANNON from 'cannon-es';
 
 export default function basic() {
   // console.log(THREE);
@@ -51,6 +53,9 @@ export default function basic() {
 
   // 반사 재질 생성
   // const box = new Box({ name: 'bar', x: 0, y: 0, z: 0 });
+
+  // 물리 엔진
+  cm1.world.gravity.set(0, -10, 0);
 
   // Water
   const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
@@ -127,14 +132,16 @@ export default function basic() {
   updateSun();
 
   // 물체만들기
-
   const stoneUnitSize = 10; // 스톤 하나의 크기
   const numberOfstone = 10; // 스톤 개수
+  const objects = []; // 물리엔진 적용할 메쉬들
 
   // 스톤
+  let stone1, stone2;
   let stoneTypeNumber = 0; // 0 or 1
   let stoneTypes = [];
   const stoneZ = [];
+  const stones = [];
   for (let i = 0; i < numberOfstone; i++) {
     stoneZ.push(-(i * stoneUnitSize * 2 - stoneUnitSize * 9));
   }
@@ -155,29 +162,33 @@ export default function basic() {
     const textureLoader = new THREE.TextureLoader();
     const stoneTexture = textureLoader.load('/textures/stone/Stylized_Rocks_002_basecolor.jpg'); // 별 이미지 로드
 
-    const stone1 = new Stone({
+    stone1 = new Stone({
       step: i + 1,
       name: `stone-${stoneTypes[0]}`,
       x: -10,
-      y: 1,
+      y: 0,
       z: stoneZ[i],
       type: stoneTypes[0],
       cannonMaterial: cm1.stonetMaterial,
       map: stoneTexture,
     });
 
-    const stone2 = new Stone({
+    stone2 = new Stone({
       step: i + 1,
       name: `stone-${stoneTypes[1]}`,
       x: 10,
-      y: 1,
+      y: 0,
       z: stoneZ[i],
       type: stoneTypes[1],
       cannonMaterial: cm1.stonetMaterial,
       map: stoneTexture,
     });
 
-    // objects.push(stone1, stone2);
+    objects.push(stone1, stone2);
+    stones.push(stone1, stone2);
+    // if (stone1.type == 'normal' || stone2.type == 'normal') {
+    //   stones.push(stone1, stone2);
+    // }
   }
 
   // 바닥
@@ -186,7 +197,8 @@ export default function basic() {
     x: 0,
     y: 0,
     z: -stoneUnitSize * 12 - stoneUnitSize / 2,
-    // z: -100,
+    cannonMaterial: cm1.defaultMaterial,
+    mass: 0,
   });
 
   const floor2 = new Floor({
@@ -194,8 +206,111 @@ export default function basic() {
     x: 0,
     y: 0,
     z: stoneUnitSize * 12 + stoneUnitSize / 2,
-    // z: 100,
+    cannonMaterial: cm1.defaultMaterial,
+    mass: 0,
   });
+
+  // 플레이어
+  const player = new Player({
+    name: 'player',
+    x: 0,
+    y: 6,
+    z: 120,
+    rotationY: Math.PI, // 180도
+    cannonMaterial: cm1.playerMaterial,
+    // mass: 30, // 무게
+  });
+  objects.push(player);
+
+  // Raycaster
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  let intersectObject;
+  let intersectObjectName;
+  function checkIntersects() {
+    raycaster.setFromCamera(mouse, camera);
+
+    //   console.log(cm1.scene.children);
+    const intersects = raycaster.intersectObjects(cm1.scene.children);
+    for (const item of intersects) {
+      // console.log('item', item);
+      // console.log(item.object);
+      // intersectObject = item.object;
+      // intersectObjectName = item.object.name;
+      // console.log(intersectObjectName);
+
+      // console.log(item.object.step); // 클릭했을 때 스텝
+      checkClickedObject(item.object);
+      break; // raycater에 처음 맞은 메쉬만 체크하기 위해 break
+    }
+  }
+
+  let fail = false;
+  let jumping = false; // 반복클릭으로 점프 제어, jump한 상태 -> true, 착지 -> false
+  let onReplay = false;
+  let win = false; // 승리
+
+  function checkClickedObject(mesh) {
+    // console.log(mesh.name.indexOf('stone')); // 없으면 -1, 있으면 시작 index
+    // stone 클릭했을 때
+
+    // if (jumping || fail) return;
+
+    if (mesh.name.indexOf('stone') >= 0) {
+      if (mesh.step - 1 === cm2.step) {
+        // 현재 스텝과 유리 mesh가 1차이가 날 때만 움직이도록
+        player.actions[2].stop();
+        player.actions[2].play(); // jump glb animation
+
+        jumping = true;
+
+        cm2.step++; // 현재 스텝
+        console.log(cm2.step);
+        switch (mesh.type) {
+          case 'normal':
+            console.log('normal');
+            setTimeout(() => {
+              fail = true;
+
+              player.actions[0].stop(); // default animation stop
+              player.actions[1].play(); // fell animation
+              setTimeout(() => {
+                // onReplay = true; // camera2 사용
+                player.cannonBody.position.y = 0;
+                // stones[i].cannonBody.position.y = 0;
+                const stones_normal = stones.filter((stone) => stone.type === 'normal');
+                stones_normal[cm2.step - 1].cannonBody.position.y = -10;
+
+                setTimeout(() => {
+                  gsap.to(player.cannonBody.position, {
+                    duration: 2,
+                    x: -100,
+                  });
+                }, 1000);
+                setTimeout(() => {
+                  onReplay = false;
+                }, 3000);
+              }, 100);
+            }, 500);
+            break;
+          case 'strong':
+            break;
+        }
+
+        // 캐논바디를 움직이게
+        gsap.to(player.cannonBody.position, {
+          duration: 1,
+          x: mesh.position.x,
+          z: stoneZ[cm2.step - 1],
+        });
+
+        gsap.to(player.cannonBody.position, {
+          duration: 0.4,
+          y: 10,
+        });
+      }
+    }
+  }
 
   // GUI
   const gui = new GUI();
@@ -218,7 +333,37 @@ export default function basic() {
   function draw() {
     const delta = clock.getDelta();
 
+    if (cm1.mixer) cm1.mixer.update(delta);
+
+    // cm1.world.step(1 / 60, delta, 3);
+
     water.material.uniforms['time'].value += 1.0 / 60.0;
+
+    // 물리엔진, cannonBody위치를 mesh들이 따라가도록 설정
+    objects.forEach((item) => {
+      // console.log(item);
+      if (item.cannonBody) {
+        if (item.name === 'player') {
+          // console.log(item.modelMesh);
+          if (item.modelMesh) {
+            item.modelMesh.position.copy(item.cannonBody.position);
+            if (fail) {
+              item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
+            } // 회전 -> 넘어지는 설정
+            item.modelMesh.quaternion.copy(item.cannonBody.quaternion); // 회전 -> 넘어지는 설정
+          }
+          // item.modelMesh.position.y += 0.15;
+        } else {
+          item.mesh.position.copy(item.cannonBody.position);
+          item.mesh.quaternion.copy(item.cannonBody.quaternion);
+
+          if (item.modelMesh) {
+            item.modelMesh.position.copy(item.cannonBody.position);
+            item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
+          }
+        }
+      }
+    });
 
     renderer.render(cm1.scene, camera);
     renderer.setAnimationLoop(draw); // vr 같은걸 만들 때는 꼭 이걸로 사용해야함
@@ -233,6 +378,13 @@ export default function basic() {
   }
   // 이벤트
   window.addEventListener('resize', setSize);
+  canvas.addEventListener('click', (e) => {
+    // if (preventDragClick.mouseMoved) return;
+    mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1;
+    mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1);
+    // console.log(mouse);
+    checkIntersects();
+  });
 
   draw();
 }

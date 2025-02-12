@@ -36,6 +36,9 @@ export class Stuff {
       new Vec3(0, 1, 0), //
       this.rotationY
     );
+
+    // console.log('Created CannonBody:', this.cannonBody); // 🔹 Debugging line
+
     cm1.world.addBody(this.cannonBody);
   }
 }

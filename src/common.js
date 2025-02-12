@@ -17,6 +17,7 @@ export const cm1 = {
   world: new World(),
   defaultMaterial: new Material('default'),
   glasstMaterial: new Material('glass'),
+  stonetMaterial: new Material('stone'),
   playerMaterial: new Material('player'),
 
   // text
@@ -43,7 +44,7 @@ export const cm2 = {
 
 export const geo = {
   pillar: new BoxGeometry(5, 10, 5),
-  floor: new BoxGeometry(50, 20, 50),
+  floor: new BoxGeometry(50, 2, 50),
   bar: new BoxGeometry(0.1, 0.3, 1.2 * 21),
   box: new BoxGeometry(1, 1, 1),
   sideLight: new SphereGeometry(0.1, 6, 6),
