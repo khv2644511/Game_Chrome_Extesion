@@ -9,6 +9,7 @@ import { GUI } from 'dat.gui';
 import { Floor } from './Floor';
 import { Stone } from './Stone';
 import { Player } from './Player';
+import * as TWEEN from 'three/addons/libs/tween.module.js';
 import * as CANNON from 'cannon-es';
 
 export default function basic() {
@@ -25,37 +26,35 @@ export default function basic() {
   renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
   renderer.shadowMap.enabled = true; // 그림자 사용
   renderer.shadowMap.type = THREE.PCFShadowMap; // 그림자 부드럽게
-  // renderer.outputEncoding = THREE.sRGBEncoding; // 색상 출력 설정
+  renderer.outputEncoding = THREE.sRGBEncoding; // 색상 출력 설정
 
   // renderer.setClearColor('#0x00ff00'); // 배경색 설정
   // renderer.setClearAlpha(0.2); // 0-1
 
-  // cm1.scene.background = new THREE.Color(cm2.backgroundColor);
-
-  //   scene.background = new THREE.Color('blue');
-
   // Camera
-  // const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 20000);
-  // camera.position.set(-50, 60, 350);
+  const camera2 = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 20000);
   camera.position.set(-40, 30, 200);
 
+  camera2.lookAt(0, 1, 0);
+  cm1.scene.add(camera, camera2);
+
+  // const helper = new THREE.CameraHelper(camera2);
+  // cm1.scene.add(helper);
+
   // Light
-  // const light = new THREE.DirectionalLight(0xffffff, 1);
-  // light.position.z = 10;
-  // cm1.scene.add(light);
   const ambientLight = new THREE.AmbientLight(cm2.lightColor, 2);
   cm1.scene.add(ambientLight);
 
   // Controls
   const controls = new OrbitControls(camera, renderer.domElement);
+  controls.minDistance = 5;
+  controls.maxDistance = 800;
   controls.enableDamping = true;
-
-  // 반사 재질 생성
-  // const box = new Box({ name: 'bar', x: 0, y: 0, z: 0 });
 
   // 물리 엔진
   cm1.world.gravity.set(0, -50, 0);
+  cm1.world.broadphase = new CANNON.SAPBroadphase(cm1.world); // 성능 향상(가장 많이 쓰임)
 
   const defaultContactMaterial = new CANNON.ContactMaterial(cm1.defaultMaterial, cm1.defaultMaterial, {
     friction: 0.3, // 마찰
@@ -185,38 +184,33 @@ export default function basic() {
       step: i + 1,
       name: `stone-${stoneTypes[0]}`,
       x: -10,
-      y: 10,
+      y: 1,
       z: stoneZ[i],
       type: stoneTypes[0],
       cannonMaterial: cm1.stonetMaterial,
       map: stoneTexture,
-      // mass: 0,
     });
 
     stone2 = new Stone({
       step: i + 1,
       name: `stone-${stoneTypes[1]}`,
       x: 10,
-      y: 10,
+      y: 1,
       z: stoneZ[i],
       type: stoneTypes[1],
       cannonMaterial: cm1.stonetMaterial,
       map: stoneTexture,
-      // mass: 0,
     });
 
     objects.push(stone1, stone2);
     stones.push(stone1, stone2);
-    // if (stone1.type == 'normal' || stone2.type == 'normal') {
-    //   stones.push(stone1, stone2);
-    // }
   }
 
   // 바닥
   const floor1 = new Floor({
     name: 'floor',
     x: 0,
-    y: 10,
+    y: 1,
     z: -stoneUnitSize * 12 - stoneUnitSize / 2,
     cannonMaterial: cm1.defaultMaterial,
     mass: 0,
@@ -225,7 +219,7 @@ export default function basic() {
   const floor2 = new Floor({
     name: 'floor',
     x: 0,
-    y: 10,
+    y: 1,
     z: stoneUnitSize * 12 + stoneUnitSize / 2,
     cannonMaterial: cm1.defaultMaterial,
     mass: 0,
@@ -236,7 +230,7 @@ export default function basic() {
     name: 'player',
     x: 0,
     // y: 6,
-    y: 30,
+    y: 20,
     z: 120,
     rotationY: Math.PI, // 180도
     cannonMaterial: cm1.playerMaterial,
@@ -300,20 +294,29 @@ export default function basic() {
               player.actions[0].stop(); // default animation stop
               player.actions[1].play(); // fell animation
               setTimeout(() => {
-                // onReplay = true; // camera2 사용
                 player.cannonBody.position.y = 0;
                 const stones_normal = stones.filter((stone) => stone.type === 'normal');
                 stones_normal[cm2.step - 1].cannonBody.position.y = -10;
 
                 setTimeout(() => {
+                  onReplay = true; // camera2 사용
+                  player.cannonBody.position.y = 9;
+                }, 500);
+
+                setTimeout(() => {
+                  tween(false); // 줌아웃
+
+                  // player 바다 떠내려가게
                   gsap.to(player.cannonBody.position, {
-                    duration: 2,
-                    x: -100,
+                    duration: 8,
+                    x: -800,
+                    y: -1,
                   });
-                }, 1000);
+                }, 2000);
+
                 setTimeout(() => {
                   onReplay = false;
-                }, 3000);
+                }, 1000);
               }, 100);
             }, 500);
             break;
@@ -330,7 +333,7 @@ export default function basic() {
 
         gsap.to(player.cannonBody.position, {
           duration: 0.4,
-          y: 20,
+          y: 13, // 점프 높이
         });
       }
     }
@@ -357,6 +360,9 @@ export default function basic() {
   function draw() {
     const delta = clock.getDelta();
 
+    TWEEN.update();
+    controls.update();
+
     if (cm1.mixer) cm1.mixer.update(delta);
 
     cm1.world.step(1 / 60, delta, 3);
@@ -372,10 +378,19 @@ export default function basic() {
             item.modelMesh.position.copy(item.cannonBody.position);
             if (fail) {
               item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
-            } // 회전 -> 넘어지는 설정
+            }
+            // 회전 -> 넘어지는 설정
             item.modelMesh.quaternion.copy(item.cannonBody.quaternion); // 회전 -> 넘어지는 설정
           }
           item.modelMesh.position.y += 5;
+
+          // 0에 수렴하도록 해서 이동속도 멈추기
+          // player.cannonBody.velocity.x *= 0.98;
+          // player.cannonBody.velocity.y *= 0.98;
+          // player.cannonBody.velocity.z *= 0.98;
+          // player.cannonBody.angularVelocity.x *= 0.98;
+          // player.cannonBody.angularVelocity.y *= 0.98;
+          // player.cannonBody.angularVelocity.z *= 0.98;
         } else {
           item.mesh.position.copy(item.cannonBody.position);
           item.mesh.quaternion.copy(item.cannonBody.quaternion);
@@ -388,17 +403,47 @@ export default function basic() {
       }
     });
 
-    renderer.render(cm1.scene, camera);
+    controls.update();
+
+    if (!onReplay) {
+      renderer.render(cm1.scene, camera);
+    } else {
+      renderer.render(cm1.scene, camera2);
+      camera2.position.x = player.cannonBody.position.x;
+      camera2.position.z = player.cannonBody.position.z;
+    }
+
+    // renderer.render(cm1.scene, camera);
+
     renderer.setAnimationLoop(draw); // vr 같은걸 만들 때는 꼭 이걸로 사용해야함
   }
 
   function setSize() {
     camera.aspect = window.innerWidth / window.innerHeight;
-    // updateProjectionMatrix => 카메라 투영에 관련된 값에 변화가 있을 경우 실행해야 함
-    camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix(); //=> 카메라 투영에 관련된 값에 변화가 있을 경우 실행해야 함
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.render(cm1.scene, camera);
   }
+
+  function tween(inout) {
+    // in - true, out - false
+
+    let desiredDistance = inout ? controls.minDistance : controls.maxDistance;
+
+    let dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    dir.negate();
+    let dist = controls.getDistance();
+
+    new TWEEN.Tween({ val: dist })
+      .to({ val: desiredDistance }, 1000)
+      // .to({ val: desiredDistance }, 1000)
+      .onUpdate((val) => {
+        camera.position.copy(controls.target).addScaledVector(dir, val.val);
+      })
+      .start();
+  }
+
   // 이벤트
   window.addEventListener('resize', setSize);
   canvas.addEventListener('click', (e) => {
