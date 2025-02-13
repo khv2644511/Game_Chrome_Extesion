@@ -11,6 +11,7 @@ import { Stone } from './Stone';
 import { Player } from './Player';
 import * as TWEEN from 'three/addons/libs/tween.module.js';
 import * as CANNON from 'cannon-es';
+import { PreventDragClick } from './PreventDragClick';
 
 export default function basic() {
   // console.log(THREE);
@@ -151,7 +152,7 @@ export default function basic() {
 
   // 물체만들기
   const stoneUnitSize = 10; // 스톤 하나의 크기
-  const numberOfstone = 10; // 스톤 개수
+  const numberOfStone = 10; // 스톤 개수
   const objects = []; // 물리엔진 적용할 메쉬들
 
   // 스톤
@@ -160,12 +161,12 @@ export default function basic() {
   let stoneTypes = [];
   const stoneZ = [];
   const stones = [];
-  for (let i = 0; i < numberOfstone; i++) {
+  for (let i = 0; i < numberOfStone; i++) {
     stoneZ.push(-(i * stoneUnitSize * 2 - stoneUnitSize * 9));
   }
   // console.log(stoneZ);
 
-  for (let i = 0; i < numberOfstone; i++) {
+  for (let i = 0; i < numberOfStone; i++) {
     stoneTypeNumber = Math.round(Math.random()); // 반올림으로 0 or 1이 나오도록
     switch (stoneTypeNumber) {
       case 0:
@@ -270,7 +271,7 @@ export default function basic() {
     // console.log(mesh.name.indexOf('stone')); // 없으면 -1, 있으면 시작 index
     // stone 클릭했을 때
 
-    // if (jumping || fail) return;
+    if (jumping || fail) return;
 
     if (mesh.name.indexOf('stone') >= 0) {
       if (mesh.step - 1 === cm2.step) {
@@ -324,6 +325,9 @@ export default function basic() {
             break;
         }
 
+        setTimeout(() => {
+          jumping = false;
+        }, 1000);
         // 캐논바디를 움직이게
         gsap.to(player.cannonBody.position, {
           duration: 1,
@@ -335,6 +339,36 @@ export default function basic() {
           duration: 0.4,
           y: 13, // 점프 높이
         });
+
+        // 게임 클리어
+        if (cm2.step === numberOfStone && mesh.type === 'strong') {
+          setTimeout(() => {
+            win = true;
+            player.actions[2].stop();
+            player.actions[2].play();
+
+            gsap.to(player.cannonBody.position, {
+              duration: 1,
+              x: 0,
+              z: -120,
+            });
+
+            gsap.to(player.cannonBody.position, {
+              duration: 0.4,
+              y: 12,
+            });
+          }, 1500);
+
+          // win text 보여주기
+          // setTimeout(() => {
+          //   const text = new Text({
+          //     x: 0,
+          //     y: mesh.position.y + 1,
+          //     z: mesh.position.z - 3,
+          //     rotationY: Math.PI,
+          //   });
+          // }, 1500);
+        }
       }
     }
   }
@@ -413,7 +447,13 @@ export default function basic() {
       camera2.position.z = player.cannonBody.position.z;
     }
 
-    // renderer.render(cm1.scene, camera);
+    if (win) {
+      // console.log(win);
+      renderer.render(cm1.scene, camera);
+      camera.position.x = player.cannonBody.position.x;
+      camera.position.y = 12;
+      camera.position.z = player.cannonBody.position.z - 20;
+    }
 
     renderer.setAnimationLoop(draw); // vr 같은걸 만들 때는 꼭 이걸로 사용해야함
   }
@@ -445,9 +485,10 @@ export default function basic() {
   }
 
   // 이벤트
+  const preventDragClick = new PreventDragClick(canvas);
   window.addEventListener('resize', setSize);
   canvas.addEventListener('click', (e) => {
-    // if (preventDragClick.mouseMoved) return;
+    if (preventDragClick.mouseMoved) return;
     mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1;
     mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1);
     // console.log(mouse);
