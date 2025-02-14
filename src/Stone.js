@@ -49,21 +49,21 @@ export class Stone extends Stuff {
     this.setCannonBody();
 
     // console.log(this.cannonBody);
-    // this.cannonBody.addEventListener('collide', playSound);
+    this.cannonBody.addEventListener('collide', playSound);
 
-    // const sound = sounds[this.type];
-    // function playSound(e) {
-    //   // 클릭 or 인터랙션 후에 음악 파일 재생 가능
-    //   // sound.play();
-    //   // play() 최초로 실행이 됨 -> play() failed because the user didn't interact with the document first. https://goo.gl/xX8pDD
+    const sound = sounds[this.type];
+    function playSound(e) {
+      // 클릭 or 인터랙션 후에 음악 파일 재생 가능
+      sound.play();
+      // play() 최초로 실행이 됨 -> play() failed because the user didn't interact with the document first. https://goo.gl/xX8pDD
 
-    //   const strength = e.contact.getImpactVelocityAlongNormal();
+      const strength = e.contact.getImpactVelocityAlongNormal();
 
-    //   if (strength > 5) {
-    //     sound.currentTime = 0; // 바로 재생되도록
-    //     sound.play();
-    //     console.log(strength);
-    //   }
-    // }
+      if (strength > 5) {
+        sound.currentTime = 0; // 바로 재생되도록
+        sound.play();
+        console.log(strength);
+      }
+    }
   }
 }

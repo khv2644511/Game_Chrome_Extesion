@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { cm1, cm2 } from './common';
+import { backgroundSound, cm1, cm2, sounds } from './common';
 import { Box } from './Box';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Sky } from 'three/addons/objects/Sky.js';
@@ -15,6 +15,7 @@ import { PreventDragClick } from './PreventDragClick';
 
 export default function basic() {
   // console.log(THREE);
+  // const backgroundsound.setLoop( true );
 
   // Renderer
   const canvas = document.querySelector('#three-canvas');
@@ -42,6 +43,26 @@ export default function basic() {
 
   // const helper = new THREE.CameraHelper(camera2);
   // cm1.scene.add(helper);
+
+  const listener = new THREE.AudioListener();
+  cm1.scene.add(listener);
+  const sound = new THREE.Audio(listener);
+  const audioLoader = new THREE.AudioLoader();
+  sound.autoplay = true;
+
+  audioLoader.load('sounds/Water Running By.mp3', function (buffer) {
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.5);
+    sound.play();
+  });
+
+  // window.addEventListener('click', () => {
+  //   if (THREE.AudioContext.getContext().state === 'suspended') {
+  //     THREE.AudioContext.getContext().resume();
+  //   }
+  // sound.play();
+  // });
 
   // Light
   const ambientLight = new THREE.AmbientLight(cm2.lightColor, 2);
