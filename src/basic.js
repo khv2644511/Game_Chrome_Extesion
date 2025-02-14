@@ -1,7 +1,8 @@
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
 import gsap from 'gsap';
-import { backgroundSound, cm1, cm2, sounds } from './common';
-import { Box } from './Box';
+import { cm1, cm2 } from './common';
+import * as TWEEN from 'three/addons/libs/tween.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { Water } from 'three/addons/objects/Water.js';
@@ -9,9 +10,9 @@ import { GUI } from 'dat.gui';
 import { Floor } from './Floor';
 import { Stone } from './Stone';
 import { Player } from './Player';
-import * as TWEEN from 'three/addons/libs/tween.module.js';
-import * as CANNON from 'cannon-es';
+import { Text } from './Text';
 import { PreventDragClick } from './PreventDragClick';
+import { gameOver, gameSucceed } from './gameManager';
 
 export default function basic() {
   // console.log(THREE);
@@ -43,19 +44,6 @@ export default function basic() {
 
   // const helper = new THREE.CameraHelper(camera2);
   // cm1.scene.add(helper);
-
-  const listener = new THREE.AudioListener();
-  cm1.scene.add(listener);
-  const sound = new THREE.Audio(listener);
-  const audioLoader = new THREE.AudioLoader();
-  sound.autoplay = true;
-
-  audioLoader.load('sounds/Water Running By.mp3', function (buffer) {
-    sound.setBuffer(buffer);
-    sound.setLoop(true);
-    sound.setVolume(0.5);
-    sound.play();
-  });
 
   // window.addEventListener('click', () => {
   //   if (THREE.AudioContext.getContext().state === 'suspended') {
@@ -328,6 +316,7 @@ export default function basic() {
                 setTimeout(() => {
                   tween(false); // 줌아웃
 
+                  gameOver();
                   // player 바다 떠내려가게
                   gsap.to(player.cannonBody.position, {
                     duration: 8,
@@ -381,14 +370,20 @@ export default function basic() {
           }, 1500);
 
           // win text 보여주기
-          // setTimeout(() => {
-          //   const text = new Text({
-          //     x: 0,
-          //     y: mesh.position.y + 1,
-          //     z: mesh.position.z - 3,
-          //     rotationY: Math.PI,
-          //   });
-          // }, 1500);
+          setTimeout(() => {
+            const text = new Text({
+              name: 'win',
+              x: 12,
+              y: mesh.position.y + 1.2,
+              z: mesh.position.z - 32,
+              rotationY: Math.PI,
+            });
+            // console.log(text);
+
+            setTimeout(() => {
+              gameSucceed();
+            }, 1000);
+          }, 1500);
         }
       }
     }

@@ -50,17 +50,17 @@ export const geo = {
   sideLight: new SphereGeometry(0.1, 6, 6),
   glass: new BoxGeometry(12, 0.05, 12),
   stone: new BoxGeometry(12, 2, 12),
-  text: new TextGeometry('YOU WIN !', {
-    font: cm1.font,
-    size: 0.5,
-    height: 0.2,
-    curveSegments: 12,
-    bevelEnabled: true,
-    bevelThickness: 0.03,
-    bevelSize: 0.02,
-    bevelOffset: 0,
-    bevelSegments: 5,
-  }),
+  // text: new TextGeometry('YOU WIN !', {
+  //   font: cm1.font,
+  //   size: 0.5,
+  //   height: 0.2,
+  //   curveSegments: 12,
+  //   bevelEnabled: true,
+  //   bevelThickness: 0.03,
+  //   bevelSize: 0.02,
+  //   bevelOffset: 0,
+  //   bevelSegments: 5,
+  // }),
 };
 
 export const mat = {

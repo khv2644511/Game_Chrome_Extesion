@@ -60,9 +60,9 @@ export class Stone extends Stuff {
       const strength = e.contact.getImpactVelocityAlongNormal();
 
       if (strength > 5) {
-        sound.currentTime = 0; // 바로 재생되도록
+        sound.currentTime = 0.1; // 바로 재생되도록
         sound.play();
-        console.log(strength);
+        console.log('strength', strength);
       }
     }
   }
