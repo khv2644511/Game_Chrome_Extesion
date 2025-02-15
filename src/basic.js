@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon-es';
+// import * as CANNON from 'cannon-es';
+import * as CANNON from 'cannon-es/dist/cannon-es.js';
 import gsap from 'gsap';
 import { cm1, cm2 } from './common';
 import * as TWEEN from 'three/addons/libs/tween.module.js';
