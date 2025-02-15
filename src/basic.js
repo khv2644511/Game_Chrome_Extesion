@@ -142,8 +142,8 @@ export default function basic() {
 
     sun.setFromSphericalCoords(1, phi, theta);
     // sun.set(-2, 2, 2);
-    console.log('sun', sun);
-    console.log('sky.material.uniforms', sky.material.uniforms);
+    // console.log('sun', sun);
+    // console.log('sky.material.uniforms', sky.material.uniforms);
 
     sky.material.uniforms['sunPosition'].value.copy(sun);
     water.material.uniforms['sunDirection'].value.copy(sun).normalize();

@@ -85,7 +85,7 @@ export const mat = {
   stone1: new MeshPhongMaterial({
     color: cm2.stoneColor,
     transparent: true,
-    opacity: 0.3, // 완전 불투명: 1
+    opacity: 0.8, // 완전 불투명: 1
   }),
   stone2: new MeshPhongMaterial({
     color: cm2.stoneColor,

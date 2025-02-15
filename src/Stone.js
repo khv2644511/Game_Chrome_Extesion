@@ -62,7 +62,7 @@ export class Stone extends Stuff {
       if (strength > 5) {
         sound.currentTime = 0.1; // 바로 재생되도록
         sound.play();
-        console.log('strength', strength);
+        // console.log('strength', strength);
       }
     }
   }

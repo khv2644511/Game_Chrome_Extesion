@@ -37,9 +37,9 @@ export class Player extends Stuff {
       this.actions[2] = cm1.mixer.clipAction(this.modelMesh.animations[2]); // jump
       this.actions[2].repetitions = 1; // 점프 한번만
 
-      console.log(this.actions[0]);
-      console.log(this.actions[1]);
-      console.log(this.actions[2]);
+      // console.log(this.actions[0]);
+      // console.log(this.actions[1]);
+      // console.log(this.actions[2]);
 
       this.actions[0].play();
 
