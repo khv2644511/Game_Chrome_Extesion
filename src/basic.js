@@ -432,7 +432,7 @@ export default function basic() {
             // 회전 -> 넘어지는 설정
             item.modelMesh.quaternion.copy(item.cannonBody.quaternion); // 회전 -> 넘어지는 설정
           }
-          item.modelMesh.position.y += 5;
+          item.modelMesh.position.y += 3.5;
 
           // 0에 수렴하도록 해서 이동속도 멈추기
           // player.cannonBody.velocity.x *= 0.98;

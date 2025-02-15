@@ -12,7 +12,7 @@ export class Player extends Stuff {
     this.height = 0.5;
     this.depth = 0.5;
 
-    cm1.gltfLoader.load('/models/ilbuni.glb', (glb) => {
+    cm1.gltfLoader.load('/models/happy.glb', (glb) => {
       // console.log(glb);
       glb.scene.traverse((child) => {
         // console.log(child);
