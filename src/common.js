@@ -96,11 +96,11 @@ export const mat = {
   text: new MeshBasicMaterial(),
 };
 export const backgroundSound = new Audio();
-backgroundSound.src = '/sounds/Water Running By.mp3';
+backgroundSound.src = '../sounds/Water Running By.mp3';
 const normalSound = new Audio();
-normalSound.src = '/sounds/sink.mp3';
+normalSound.src = '../sounds/sink.mp3';
 const strongSound = new Audio();
-strongSound.src = '/sounds/walkOnRocks.mp3';
+strongSound.src = '../sounds/walkOnRocks.mp3';
 export const sounds = {
   normal: normalSound,
   strong: strongSound,

@@ -29,7 +29,7 @@ export default function basic() {
   renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
   renderer.shadowMap.enabled = true; // 그림자 사용
   renderer.shadowMap.type = THREE.PCFShadowMap; // 그림자 부드럽게
-  renderer.outputEncoding = THREE.sRGBEncoding; // 색상 출력 설정
+  // renderer.outputEncoding = THREE.sRGBEncoding; // 색상 출력 설정
 
   // renderer.setClearColor('#0x00ff00'); // 배경색 설정
   // renderer.setClearAlpha(0.2); // 0-1
@@ -188,7 +188,7 @@ export default function basic() {
     //   console.log(stoneTypes);
 
     const textureLoader = new THREE.TextureLoader();
-    const stoneTexture = textureLoader.load('/textures/stone/Stylized_Rocks_002_basecolor.jpg'); // 별 이미지 로드
+    const stoneTexture = textureLoader.load('../textures/stone/Stylized_Rocks_002_basecolor.jpg'); // 별 이미지 로드
 
     stone1 = new Stone({
       step: i + 1,
