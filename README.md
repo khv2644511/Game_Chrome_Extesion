@@ -1,1 +1,1 @@
-# ThreeJS_Random_Game
+# ThreeJS_Random_Game_Extension
